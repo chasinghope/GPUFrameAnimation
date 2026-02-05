@@ -14,7 +14,7 @@ namespace GameLogic
 
         private IEnumerator GenerateOverTime()
         {
-
+            int index = 0;
             for (int i = 0; i < count; i++)
             {
                 Vector3 pos = Vector3.zero;
@@ -24,7 +24,13 @@ namespace GameLogic
                 int prefabIndex = i % prefabs.Count;
                 GameObject prefab = prefabs[prefabIndex];
                 GameObject go = Instantiate(prefab, pos, Quaternion.identity);
-                yield return new WaitForSeconds(1f / 60f);
+
+                index++;
+                if (index > 30)
+                {
+                    yield return new WaitForSeconds(1f / 60f);
+                }
+
             }
         }
 

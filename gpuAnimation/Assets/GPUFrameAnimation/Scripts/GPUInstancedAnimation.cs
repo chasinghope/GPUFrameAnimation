@@ -106,8 +106,16 @@ public class GPUInstancedAnimation : MonoBehaviour
     
         if (autoScale && newCategoryMat.mainTexture != null)
         {
-            float aspectRatio = ((float)newCategoryMat.mainTexture.width / columns) / ((float)newCategoryMat.mainTexture.height / rows);
-            transform.localScale = new Vector3(aspectRatio * baseScale, 1.0f * baseScale, 1.0f);
+            float pW = (float)mainTexture.width / Mathf.Max(1, columns);
+            float pH = (float)mainTexture.height / Mathf.Max(1, rows);
+
+            // 换算为 Unity 单位：Pixel / PPU
+            Vector3 targetScale = new Vector3(
+                (pW / 100f) * baseScale, 
+                (pH / 100f) * baseScale, 
+                1f
+            );
+            transform.localScale = targetScale;
         }
     }
 
