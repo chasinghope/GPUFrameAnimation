@@ -144,8 +144,7 @@ public class GPUInstancedAnimation : MonoBehaviour
         if (_renderer.sharedMaterial == null)
         {
 #if UNITY_EDITOR
-            string materialPath = "Assets/AssetRaw/Materials/Mat_GPUAnim.mat"; 
-            Material loadedMat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+            Material loadedMat = Resources.Load<Material>("Materials/Mat_GPUAnim");
             if (loadedMat != null) _renderer.sharedMaterial = loadedMat;
 #endif
         }

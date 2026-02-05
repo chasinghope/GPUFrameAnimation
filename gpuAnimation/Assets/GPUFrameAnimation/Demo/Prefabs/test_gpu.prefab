@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6144671042006040169}
   - component: {fileID: 4050783701914502534}
   m_Layer: 0
-  m_Name: Quad_gpu2
+  m_Name: test_gpu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,10 +96,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0a7c90fe0b4fbda5d749494bf837fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainTexture: {fileID: 2800000, guid: edd2e730258a61a4ca9fc12c3c23e8d4, type: 3}
+  mainTexture: {fileID: 2800000, guid: a4632ac72ca6f8443aa516921ce90ba2, type: 3}
   columns: 4
   rows: 4
-  totalFrames: 16
+  totalFrames: 15
   fps: 30
   isLoop: 1
   autoScale: 1
