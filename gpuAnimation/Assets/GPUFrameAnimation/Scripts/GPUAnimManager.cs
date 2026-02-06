@@ -20,7 +20,9 @@ public class GPUAnimManager : MonoBehaviour
     [Tooltip("基础材质球，需使用支持 Instancing 的 Shader")]
     public Material baseMaterial;
 
-    // 材质缓存池：Key 为贴图，Value 为生成的唯一材质
+    /// <summary>
+    /// 材质缓存池：Key 为贴图，Value 为生成的唯一材质
+    /// </summary>
     private Dictionary<Texture2D, Material> _materialPool = new Dictionary<Texture2D, Material>();
 
     public Material GetSharedMaterial(Texture2D tex)

@@ -247,8 +247,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabs:
   - {fileID: 5492945792321543131, guid: 1e012f78ea45f484bbe759d7ee911e08, type: 3}
-  - {fileID: 5492945792321543131, guid: 812c441962977b54e93f982ee7462b2a, type: 3}
-  - {fileID: 5492945792321543131, guid: 8e1cddb9b9e5b4a43a2a7ce50f5c9dba, type: 3}
   count: 1000
 --- !u!1 &228536491
 GameObject:
@@ -576,6 +574,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabs:
   - {fileID: 5492945792321543131, guid: fd7299e31d1556746b3d11ae528c0211, type: 3}
+  - {fileID: 5492945792321543131, guid: 89223ea6077e7fa43bba93ae1ad647f5, type: 3}
+  - {fileID: 5492945792321543131, guid: 0b540aaf751f5354db6ecf77d9689227, type: 3}
   count: 1000
 --- !u!4 &788504485
 Transform:
@@ -1189,7 +1189,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 23.4, y: -14}
+  m_AnchoredPosition: {x: 23.400024, y: -14}
   m_SizeDelta: {x: 109.7752, y: 32.0265}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2000140504
