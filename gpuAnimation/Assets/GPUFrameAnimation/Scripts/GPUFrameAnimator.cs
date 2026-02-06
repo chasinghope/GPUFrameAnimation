@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameLogic
+namespace GPUAnimation
 {
     [System.Serializable]
     public class GPUAnimationParam
