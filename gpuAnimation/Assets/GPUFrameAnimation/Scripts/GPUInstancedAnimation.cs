@@ -1,27 +1,21 @@
 using UnityEngine;
 using System;
-using UnityEngine.Serialization;
 
 namespace GPUAnimation
 {
-    [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
     public class GPUInstancedAnimation : MonoBehaviour
     {
         [Header("Resources")]
         public Texture2D mainTexture;
+        public float pixelsPerUnit = 100f;
+        public Vector2 Pivot = new Vector2(0.5f, 0.5f);
         
         [Header("Layout Settings")]
-        public int columns = 8;
         public int rows = 8;
+        public int columns = 8;
         public int totalFrames = 64;
         public float fps = 30f;
         public bool isLoop = true;
-
-        [Header("Transform Settings")]
-        public bool autoScale = true; 
-        public float baseScale = 1.0f;
-
-        public Vector2 Pivot = new Vector2(0.5f, 0.5f);
 
         // --- C# 标准事件接口 ---
         public event Action<GPUInstancedAnimation> OnPlayStart;    
@@ -29,6 +23,7 @@ namespace GPUAnimation
 
         public bool IsPlaying { get; private set; }
 
+        private Transform child;
         private MaterialPropertyBlock _propBlock;
         private MeshRenderer _renderer;
         private float _duration;
@@ -43,22 +38,20 @@ namespace GPUAnimation
         private static readonly int ID_PivotOffset = Shader.PropertyToID("_PivotOffset");
 
         private void Reset() => SetupMeshAndMaterial();
-
-        private void OnValidate()
-        {
-            if (_renderer == null) _renderer = GetComponent<MeshRenderer>();
-            SyncPreview();
-        }
+        
 
         private void Awake()
         {
-            _renderer = GetComponent<MeshRenderer>();
+            child = transform.GetChild(0);
+            if (child == null)
+            {
+                Debug.LogError($"没有发现渲染子物体");
+                return;
+            }
+            _renderer = child.GetComponent<MeshRenderer>();
             _propBlock = new MaterialPropertyBlock();
             
-            if (Application.isPlaying)
-            {
-                InitAnimation();
-            }
+            InitAnimation();
         }
 
         private void OnEnable()
@@ -105,23 +98,21 @@ namespace GPUAnimation
 
         public void ChangeAnimationCategory(Material newCategoryMat)
         {
-            if (_renderer == null) _renderer = GetComponent<MeshRenderer>();
-            
             // 关键点：使用 sharedMaterial 实现同类合批
             _renderer.sharedMaterial = newCategoryMat;
         
-            if (autoScale && newCategoryMat.mainTexture != null)
+            if (newCategoryMat.mainTexture != null)
             {
                 float pW = (float)mainTexture.width / Mathf.Max(1, columns);
                 float pH = (float)mainTexture.height / Mathf.Max(1, rows);
-
+                
                 // 换算为 Unity 单位：Pixel / PPU
                 Vector3 targetScale = new Vector3(
-                    (pW / 100f) * baseScale, 
-                    (pH / 100f) * baseScale, 
+                    (pW / pixelsPerUnit), 
+                    (pH / pixelsPerUnit), 
                     1f
                 );
-                transform.localScale = targetScale;
+                child.localScale = targetScale;
             }
         }
 
@@ -149,7 +140,18 @@ namespace GPUAnimation
         // 辅助方法：确保 Editor 模式下有材质显示
         private void SetupMeshAndMaterial()
         {
-            MeshFilter mf = GetComponent<MeshFilter>();
+            int childCount = transform.childCount;
+            for (int i = childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+            }
+            GameObject renderChild = new GameObject("[Don't Handle]");
+            renderChild.transform.SetParent(transform);
+            renderChild.transform.localPosition = Vector3.zero;
+            renderChild.transform.localRotation = Quaternion.identity;
+            renderChild.transform.localScale = Vector3.one;
+            
+            MeshFilter mf = renderChild.AddComponent<MeshFilter>();
             if (mf.sharedMesh == null)
             {
                 GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -157,23 +159,40 @@ namespace GPUAnimation
                 DestroyImmediate(temp);
             }
 
-            _renderer = GetComponent<MeshRenderer>();
-            if (_renderer.sharedMaterial == null)
+            MeshRenderer meshRenderer = renderChild.AddComponent<MeshRenderer>();
+            if (meshRenderer.sharedMaterial == null)
             {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
                 Material loadedMat = Resources.Load<Material>("Materials/Mat_GPUAnim");
-                if (loadedMat != null) _renderer.sharedMaterial = loadedMat;
-    #endif
+                if (loadedMat != null) meshRenderer.sharedMaterial = loadedMat;
+#endif
             }
         }
 
         private void SyncPreview()
         {
             UpdateProperties(0);
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
             if (!Application.isPlaying) UnityEditor.SceneView.RepaintAll();
-    #endif
+#endif
         }
+        
+        
+#if UNITY_EDITOR
+        [ContextMenu("Sync PPU from Texture")]
+        public void SyncPPUFromTexture()
+        {
+            if (mainTexture == null) return;
+            string path = UnityEditor.AssetDatabase.GetAssetPath(mainTexture);
+            var importer = UnityEditor.AssetImporter.GetAtPath(path) as UnityEditor.TextureImporter;
+            if (importer != null)
+            {
+                pixelsPerUnit = importer.spritePixelsPerUnit;
+                UnityEditor.EditorUtility.SetDirty(this);
+                SyncPreview();
+            }
+        }
+#endif
     }
 }
