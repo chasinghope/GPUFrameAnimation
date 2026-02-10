@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 585803168558474600}
   - component: {fileID: 4050783701914502534}
   m_Layer: 0
-  m_Name: gpuAnimation
+  m_Name: GPUAnimEntity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
