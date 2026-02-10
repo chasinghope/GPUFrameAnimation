@@ -44,6 +44,7 @@ Properties
                 UNITY_DEFINE_INSTANCED_PROP(float, _FPS)
                 UNITY_DEFINE_INSTANCED_PROP(float, _Loop)
                 UNITY_DEFINE_INSTANCED_PROP(float, _StartTime)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _PivotOffset)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             v2f vert (appdata v)
@@ -60,6 +61,13 @@ Properties
                 float startTime = UNITY_ACCESS_INSTANCED_PROP(Props, _StartTime);
                 float cols = UNITY_ACCESS_INSTANCED_PROP(Props, _Columns);
                 float rows = UNITY_ACCESS_INSTANCED_PROP(Props, _Rows);
+                
+                
+                float4 pivotOffset = UNITY_ACCESS_INSTANCED_PROP(Props, _PivotOffset);
+                // 在转剪裁空间之前，修改模型空间下的顶点位置
+                float4 vPos = v.vertex;
+                vPos.xy -= pivotOffset.xy;
+                o.pos = UnityObjectToClipPos(vPos);
 
                 // 计算相对时间：当前全局时间 - 记录的开始时间
                 float relativeTime = max(0, _Time.y - startTime);

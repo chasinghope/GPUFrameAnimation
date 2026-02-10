@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using UnityEngine.Serialization;
 
 namespace GPUAnimation
 {
@@ -20,6 +21,8 @@ namespace GPUAnimation
         public bool autoScale = true; 
         public float baseScale = 1.0f;
 
+        public Vector2 Pivot = new Vector2(0.5f, 0.5f);
+
         // --- C# 标准事件接口 ---
         public event Action<GPUInstancedAnimation> OnPlayStart;    
         public event Action<GPUInstancedAnimation> OnPlayFinished; 
@@ -37,6 +40,7 @@ namespace GPUAnimation
         private static readonly int ID_FPS = Shader.PropertyToID("_FPS");
         private static readonly int ID_Loop = Shader.PropertyToID("_Loop");
         private static readonly int ID_StartTime = Shader.PropertyToID("_StartTime");
+        private static readonly int ID_PivotOffset = Shader.PropertyToID("_PivotOffset");
 
         private void Reset() => SetupMeshAndMaterial();
 
@@ -128,7 +132,10 @@ namespace GPUAnimation
 
             _renderer.GetPropertyBlock(_propBlock);
 
+            Vector4 pivotOffset = new Vector4(Pivot.x - 0.5f, Pivot.y - 0.5f, 0, 0);
+            
             // 仅提交数值，不提交 Texture 以维持合批
+            _propBlock.SetVector(ID_PivotOffset, pivotOffset);
             _propBlock.SetFloat(ID_Columns, columns);
             _propBlock.SetFloat(ID_Rows, rows);
             _propBlock.SetFloat(ID_TotalFrames, totalFrames);

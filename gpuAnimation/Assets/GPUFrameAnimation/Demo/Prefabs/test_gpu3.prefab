@@ -104,3 +104,4 @@ MonoBehaviour:
   isLoop: 1
   autoScale: 1
   baseScale: 1
+  Pivot: {x: 0.5, y: 0.66}
