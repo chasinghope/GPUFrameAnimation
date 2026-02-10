@@ -138,6 +138,19 @@ namespace GPUAnimation
         
             _renderer.SetPropertyBlock(_propBlock);
         }
+        
+        public void SetTintColor(Color color)
+        {
+            this.tintColor = color;
+            
+            // 立即应用修改
+            if (_renderer == null) return;
+            if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
+
+            _renderer.GetPropertyBlock(_propBlock);
+            _propBlock.SetColor(ID_Color, tintColor); // 提交颜色到 PropertyBlock
+            _renderer.SetPropertyBlock(_propBlock);
+        }
 
         private void SyncPreview()
         {
@@ -164,5 +177,6 @@ namespace GPUAnimation
             }
         }
 #endif
+        
     }
 }
