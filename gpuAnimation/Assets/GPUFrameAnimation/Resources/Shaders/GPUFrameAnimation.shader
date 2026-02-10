@@ -49,6 +49,7 @@ Properties
                 UNITY_DEFINE_INSTANCED_PROP(float, _Loop)
                 UNITY_DEFINE_INSTANCED_PROP(float, _StartTime)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _PivotOffset)
+                UNITY_DEFINE_INSTANCED_PROP(float, _IsEditorPreview) // 编辑器预览模式：1=静态显示第一帧
             UNITY_INSTANCING_BUFFER_END(Props)
 
             v2f vert (appdata v)
@@ -74,14 +75,25 @@ Properties
                 vPos.xy -= pivotOffset.xy;
                 o.pos = UnityObjectToClipPos(vPos);
 
-                // 计算相对时间：当前全局时间 - 记录的开始时间
-                float relativeTime = max(0, _Time.y - startTime);
-                float frameIndex = floor(relativeTime * fps);
+                float isEditorPreview = UNITY_ACCESS_INSTANCED_PROP(Props, _IsEditorPreview);
+                
+                float frameIndex;
+                // 编辑器预览模式：强制显示第一帧
+                if (isEditorPreview > 0.5)
+                {
+                    frameIndex = 0;
+                }
+                else
+                {
+                    // 计算相对时间：当前全局时间 - 记录的开始时间
+                    float relativeTime = max(0, _Time.y - startTime);
+                    frameIndex = floor(relativeTime * fps);
 
-                if (loop > 0.5) {
-                    frameIndex = fmod(frameIndex, totalFrames);
-                } else {
-                    frameIndex = min(frameIndex, totalFrames - 1);
+                    if (loop > 0.5) {
+                        frameIndex = fmod(frameIndex, totalFrames);
+                    } else {
+                        frameIndex = min(frameIndex, totalFrames - 1);
+                    }
                 }
                 
                 frameIndex = frameIndex + startFrame;

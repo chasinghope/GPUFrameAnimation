@@ -3,6 +3,7 @@ using System;
 
 namespace GPUAnimation
 {
+    [ExecuteInEditMode]
     public class GPUInstancedAnimation : MonoBehaviour
     {
         [Header("Resources")]
@@ -40,6 +41,7 @@ namespace GPUAnimation
         private static readonly int ID_StartTime = Shader.PropertyToID("_StartTime");
         private static readonly int ID_PivotOffset = Shader.PropertyToID("_PivotOffset");
         private static readonly int ID_Color = Shader.PropertyToID("_Color");
+        private static readonly int ID_IsEditorPreview = Shader.PropertyToID("_IsEditorPreview");
         
         
 
@@ -54,11 +56,112 @@ namespace GPUAnimation
             _renderer = child.GetComponent<MeshRenderer>();
             _propBlock = new MaterialPropertyBlock();
             
-            InitAnimation();
+#if UNITY_EDITOR
+            // 编辑器模式下立即初始化预览
+            if (!Application.isPlaying)
+            {
+                InitEditorPreview();
+            }
+            else
+#endif
+            {
+                InitAnimation();
+            }
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// 编辑器模式下的预览初始化
+        /// </summary>
+        private void InitEditorPreview()
+        {
+            if (mainTexture == null || _renderer == null) return;
+
+            // 编辑器模式下直接创建材质，不依赖GPUAnimManager
+            if (_renderer.sharedMaterial == null || _renderer.sharedMaterial.shader.name != "Custom/GPUFrameAnimation")
+            {
+                Material previewMat = new Material(Shader.Find("Custom/GPUFrameAnimation"));
+                previewMat.name = $"Mat_GPU_Editor_{mainTexture.name}";
+                previewMat.mainTexture = mainTexture;
+                previewMat.enableInstancing = true;
+                _renderer.sharedMaterial = previewMat;
+            }
+            else
+            {
+                _renderer.sharedMaterial.mainTexture = mainTexture;
+            }
+
+            // 设置网格尺寸
+            float pW = (float)mainTexture.width / Mathf.Max(1, columns);
+            float pH = (float)mainTexture.height / Mathf.Max(1, rows);
+            Vector3 targetScale = new Vector3(
+                (pW / pixelsPerUnit), 
+                (pH / pixelsPerUnit), 
+                1f
+            );
+            child.localScale = targetScale;
+
+            // 更新材质属性显示第一帧
+            UpdateEditorPreviewProperties();
+        }
+
+        /// <summary>
+        /// 更新编辑器预览属性 - 强制显示第一帧
+        /// </summary>
+        private void UpdateEditorPreviewProperties()
+        {
+            if (_renderer == null) return;
+            if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
+
+            _renderer.GetPropertyBlock(_propBlock);
+
+            Vector4 pivotOffset = new Vector4(Pivot.x - 0.5f, Pivot.y - 0.5f, 0, 0);
+            
+            // 编辑器模式下设置属性显示第一帧
+            _propBlock.SetColor(ID_Color, tintColor);
+            _propBlock.SetVector(ID_PivotOffset, pivotOffset);
+            _propBlock.SetFloat(ID_Columns, columns);
+            _propBlock.SetFloat(ID_Rows, rows);
+            _propBlock.SetFloat(ID_StartFrame, startFrame);
+            _propBlock.SetFloat(ID_TotalFrames, totalFrames);
+            _propBlock.SetFloat(ID_FPS, fps);
+            _propBlock.SetFloat(ID_Loop, isLoop ? 1f : 0f);
+            _propBlock.SetFloat(ID_StartTime, 0f);
+            // 关键：启用编辑器预览模式，强制Shader显示第一帧（不随时间变化）
+            _propBlock.SetFloat(ID_IsEditorPreview, 1f);
+        
+            _renderer.SetPropertyBlock(_propBlock);
+        }
+
+        private void OnValidate()
+        {
+            // 属性改变时立即更新预览
+            if (!Application.isPlaying && _renderer != null)
+            {
+                InitEditorPreview();
+            }
+        }
+#endif
 
         private void OnEnable()
         {
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                // 编辑器模式下重新初始化预览
+                if (_renderer == null || child == null)
+                {
+                    child = transform.GetChild(0);
+                    if (child != null)
+                    {
+                        _renderer = child.GetComponent<MeshRenderer>();
+                        _propBlock = new MaterialPropertyBlock();
+                    }
+                }
+                InitEditorPreview();
+                return;
+            }
+#endif
             if (Application.isPlaying) Play();
         }
 
