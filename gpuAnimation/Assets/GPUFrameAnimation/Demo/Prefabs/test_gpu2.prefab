@@ -134,6 +134,9 @@ MonoBehaviour:
   tintColor: {r: 1, g: 1, b: 1, a: 1}
   rows: 4
   columns: 4
+  startFrame: 0
   totalFrames: 16
   fps: 30
   isLoop: 1
+  AutoPlay: 1
+  IgnoreTimeScale: 0

@@ -48,11 +48,15 @@ MonoBehaviour:
   mainTexture: {fileID: 2800000, guid: f8fa3569c5e33ba448418c5e5437490d, type: 3}
   pixelsPerUnit: 100
   Pivot: {x: 0.5, y: 0.66}
-  columns: 14
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   rows: 1
+  columns: 14
+  startFrame: 0
   totalFrames: 14
   fps: 30
   isLoop: 1
+  AutoPlay: 1
+  IgnoreTimeScale: 0
 --- !u!1 &9098995564703034784
 GameObject:
   m_ObjectHideFlags: 0

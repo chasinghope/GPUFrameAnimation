@@ -51,9 +51,12 @@ MonoBehaviour:
   tintColor: {r: 1, g: 1, b: 1, a: 1}
   rows: 4
   columns: 4
+  startFrame: 0
   totalFrames: 15
   fps: 30
   isLoop: 1
+  AutoPlay: 1
+  IgnoreTimeScale: 0
 --- !u!1 &5560518807964461514
 GameObject:
   m_ObjectHideFlags: 0
