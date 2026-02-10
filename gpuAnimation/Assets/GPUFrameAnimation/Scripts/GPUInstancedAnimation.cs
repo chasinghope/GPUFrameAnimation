@@ -9,6 +9,7 @@ namespace GPUAnimation
         public Texture2D mainTexture;
         public float pixelsPerUnit = 100f;
         public Vector2 Pivot = new Vector2(0.5f, 0.5f);
+        public Color tintColor = Color.white;
         
         [Header("Layout Settings")]
         public int rows = 8;
@@ -36,8 +37,8 @@ namespace GPUAnimation
         private static readonly int ID_Loop = Shader.PropertyToID("_Loop");
         private static readonly int ID_StartTime = Shader.PropertyToID("_StartTime");
         private static readonly int ID_PivotOffset = Shader.PropertyToID("_PivotOffset");
-
-        private void Reset() => SetupMeshAndMaterial();
+        private static readonly int ID_Color = Shader.PropertyToID("_Color");
+        
         
 
         private void Awake()
@@ -126,6 +127,7 @@ namespace GPUAnimation
             Vector4 pivotOffset = new Vector4(Pivot.x - 0.5f, Pivot.y - 0.5f, 0, 0);
             
             // 仅提交数值，不提交 Texture 以维持合批
+            _propBlock.SetColor(ID_Color, tintColor);
             _propBlock.SetVector(ID_PivotOffset, pivotOffset);
             _propBlock.SetFloat(ID_Columns, columns);
             _propBlock.SetFloat(ID_Rows, rows);
@@ -135,38 +137,6 @@ namespace GPUAnimation
             _propBlock.SetFloat(ID_StartTime, startTime); 
         
             _renderer.SetPropertyBlock(_propBlock);
-        }
-
-        // 辅助方法：确保 Editor 模式下有材质显示
-        private void SetupMeshAndMaterial()
-        {
-            int childCount = transform.childCount;
-            for (int i = childCount - 1; i >= 0; i--)
-            {
-                DestroyImmediate(transform.GetChild(i).gameObject);
-            }
-            GameObject renderChild = new GameObject("[Don't Handle]");
-            renderChild.transform.SetParent(transform);
-            renderChild.transform.localPosition = Vector3.zero;
-            renderChild.transform.localRotation = Quaternion.identity;
-            renderChild.transform.localScale = Vector3.one;
-            
-            MeshFilter mf = renderChild.AddComponent<MeshFilter>();
-            if (mf.sharedMesh == null)
-            {
-                GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                mf.sharedMesh = temp.GetComponent<MeshFilter>().sharedMesh;
-                DestroyImmediate(temp);
-            }
-
-            MeshRenderer meshRenderer = renderChild.AddComponent<MeshRenderer>();
-            if (meshRenderer.sharedMaterial == null)
-            {
-#if UNITY_EDITOR
-                Material loadedMat = Resources.Load<Material>("Materials/Mat_GPUAnim");
-                if (loadedMat != null) meshRenderer.sharedMaterial = loadedMat;
-#endif
-            }
         }
 
         private void SyncPreview()

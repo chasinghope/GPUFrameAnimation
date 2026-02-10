@@ -3,6 +3,7 @@ Shader "Custom/GPUFrameAnimation"
 Properties
     {
         [NoScaleOffset] _MainTex ("Main Texture", 2D) = "white" {}
+        _Color ("Tint Color", Color) = (1,1,1,1) // 添加叠色属性
         _Columns ("Columns", Float) = 8
         _Rows ("Rows", Float) = 8
         _TotalFrames ("Total Frames", Float) = 64
@@ -38,6 +39,7 @@ Properties
             sampler2D _MainTex;
 
             UNITY_INSTANCING_BUFFER_START(Props)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _Color) // 添加到 Buffer
                 UNITY_DEFINE_INSTANCED_PROP(float, _Columns)
                 UNITY_DEFINE_INSTANCED_PROP(float, _Rows)
                 UNITY_DEFINE_INSTANCED_PROP(float, _TotalFrames)
@@ -92,7 +94,8 @@ Properties
             fixed4 frag (v2f i) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i);
-                return tex2D(_MainTex, i.uv);
+                fixed4 tint = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+                return tex2D(_MainTex, i.uv) * tint;
             }
             ENDCG
         }

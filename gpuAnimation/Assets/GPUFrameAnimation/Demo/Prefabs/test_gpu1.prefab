@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 585803168558474600}
   - component: {fileID: 4050783701914502534}
   m_Layer: 0
-  m_Name: test_gpu2
+  m_Name: test_gpu1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
   mainTexture: {fileID: 2800000, guid: a4632ac72ca6f8443aa516921ce90ba2, type: 3}
   pixelsPerUnit: 100
   Pivot: {x: 0.5, y: 0}
-  tintColor: {r: 0.108944766, g: 0.6603774, b: 0, a: 1}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   rows: 4
   columns: 4
   totalFrames: 15

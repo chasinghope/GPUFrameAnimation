@@ -659,7 +659,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabs:
-  - {fileID: 5492945792321543131, guid: 89223ea6077e7fa43bba93ae1ad647f5, type: 3}
+  - {fileID: 5492945792321543131, guid: 085a48efbc0abdd49915103abccd9a71, type: 3}
+  - {fileID: 5492945792321543131, guid: e07c0195cdc2147479bcd40e41a2618e, type: 3}
   count: 1
 --- !u!4 &788504485
 Transform:
