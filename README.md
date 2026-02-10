@@ -2,6 +2,8 @@
 
 本系统基于 **GPU Instancing** 技术实现，支持在保持极低 Draw Call 的前提下，实现海量序列帧动画实体的独立播放与动态叠色。
 
+[TOC]
+
 ## 1. 核心特性
 
 **高性能合批**：即使每个实体的动画进度、缩放、颜色不同，只要使用相同贴图，即可实现 GPU Instancing 合批 。
@@ -16,19 +18,7 @@
 
 ## 2. 环境配置
 
-### 2.1 Shader 准备
-
-请确保项目中包含 `GPUFrameAnimation.shader`。
-
-- **关键属性**：包含 `_Columns`（列数）、`_Rows`（行数）、`_FPS`（帧率）等控制参数 。
-- **渲染设置**：默认为透明队列（Transparent），关闭深度写入（ZWrite Off） 。
-
-### 2.2 预制体模板
-
-在项目路径 `Assets/Resources/Prefabs/` 下创建名为 `GPUAnimEntity.prefab` 的预制体。
-
-1. 根节点挂载 `GPUInstancedAnimation.cs` 脚本。
-2. 子节点（名为 `[Don't Handle]`）挂载 `MeshFilter`（Quad）和 `MeshRenderer`。
+- 下载并导入 GpuFrameAnimation.unitypackage
 
 ## 3. 快速上手
 
