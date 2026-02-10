@@ -14,6 +14,7 @@ namespace GPUAnimation
         [Header("Layout Settings")]
         public int rows = 8;
         public int columns = 8;
+        public int startFrame = 0; // 暴露起始帧设置
         public int totalFrames = 64;
         public float fps = 30f;
         public bool isLoop = true;
@@ -32,6 +33,7 @@ namespace GPUAnimation
 
         private static readonly int ID_Columns = Shader.PropertyToID("_Columns");
         private static readonly int ID_Rows = Shader.PropertyToID("_Rows");
+        private static readonly int ID_StartFrame = Shader.PropertyToID("_StartFrame");
         private static readonly int ID_TotalFrames = Shader.PropertyToID("_TotalFrames");
         private static readonly int ID_FPS = Shader.PropertyToID("_FPS");
         private static readonly int ID_Loop = Shader.PropertyToID("_Loop");
@@ -131,6 +133,7 @@ namespace GPUAnimation
             _propBlock.SetVector(ID_PivotOffset, pivotOffset);
             _propBlock.SetFloat(ID_Columns, columns);
             _propBlock.SetFloat(ID_Rows, rows);
+            _propBlock.SetFloat(ID_StartFrame, startFrame);
             _propBlock.SetFloat(ID_TotalFrames, totalFrames);
             _propBlock.SetFloat(ID_FPS, fps);
             _propBlock.SetFloat(ID_Loop, isLoop ? 1f : 0f);

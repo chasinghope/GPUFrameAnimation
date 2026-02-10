@@ -6,6 +6,7 @@ Properties
         _Color ("Tint Color", Color) = (1,1,1,1) // 添加叠色属性
         _Columns ("Columns", Float) = 8
         _Rows ("Rows", Float) = 8
+        _StartFrame ("Start Frame", Float) = 0
         _TotalFrames ("Total Frames", Float) = 64
         _FPS ("FPS", Float) = 30
         [Toggle] _Loop ("Is Loop", Float) = 1
@@ -42,6 +43,7 @@ Properties
                 UNITY_DEFINE_INSTANCED_PROP(float4, _Color) // 添加到 Buffer
                 UNITY_DEFINE_INSTANCED_PROP(float, _Columns)
                 UNITY_DEFINE_INSTANCED_PROP(float, _Rows)
+                UNITY_DEFINE_INSTANCED_PROP(float, _StartFrame) // 添加到 Buffer
                 UNITY_DEFINE_INSTANCED_PROP(float, _TotalFrames)
                 UNITY_DEFINE_INSTANCED_PROP(float, _FPS)
                 UNITY_DEFINE_INSTANCED_PROP(float, _Loop)
@@ -58,6 +60,7 @@ Properties
                 o.pos = UnityObjectToClipPos(v.vertex);
                 
                 float fps = UNITY_ACCESS_INSTANCED_PROP(Props, _FPS);
+                float startFrame = UNITY_ACCESS_INSTANCED_PROP(Props, _StartFrame);
                 float totalFrames = UNITY_ACCESS_INSTANCED_PROP(Props, _TotalFrames);
                 float loop = UNITY_ACCESS_INSTANCED_PROP(Props, _Loop);
                 float startTime = UNITY_ACCESS_INSTANCED_PROP(Props, _StartTime);
@@ -80,6 +83,8 @@ Properties
                 } else {
                     frameIndex = min(frameIndex, totalFrames - 1);
                 }
+                
+                frameIndex = frameIndex + startFrame;
 
                 float2 size = float2(1.0 / cols, 1.0 / rows);
                 float row = floor(frameIndex / cols);
