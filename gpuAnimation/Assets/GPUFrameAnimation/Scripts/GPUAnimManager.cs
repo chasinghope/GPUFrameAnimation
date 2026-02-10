@@ -7,6 +7,7 @@ namespace GPUAnimation
     public class GPUAnimManager : MonoBehaviour
     {
         private static GPUAnimManager _instance;
+        private static readonly object _lock = new object();
         private static readonly int UnscaledTime = Shader.PropertyToID("_UnscaledTime");
 
         public static GPUAnimManager Instance
@@ -15,8 +16,15 @@ namespace GPUAnimation
             {
                 if (_instance == null)
                 {
-                    _instance = new GameObject("GPUAnimManager").AddComponent<GPUAnimManager>();
-                    DontDestroyOnLoad(_instance.gameObject);
+                    lock (_lock)
+                    {
+                        if (_instance == null)
+                        {
+                            GameObject managerObj = new GameObject("GPUAnimManager");
+                            _instance = managerObj.AddComponent<GPUAnimManager>();
+                            DontDestroyOnLoad(managerObj);
+                        }
+                    }
                 }
                 return _instance;
             }
@@ -32,7 +40,11 @@ namespace GPUAnimation
 
         public Material GetSharedMaterial(Texture2D tex)
         {
-            if (tex == null) return null;
+            if (tex == null) 
+            {
+                Debug.LogError("传入的纹理不能为空");
+                return null;
+            }
 
             if (!_materialPool.TryGetValue(tex, out Material mat))
             {
@@ -41,7 +53,11 @@ namespace GPUAnimation
                 {
                     // 如果没有手动指定基础材质，则尝试加载默认路径
                     baseMaterial = Resources.Load<Material>("Materials/Mat_GPUAnim");
-                    if (baseMaterial == null) return null;
+                    if (baseMaterial == null) 
+                    {
+                        Debug.LogError("无法加载基础材质，请确保 Resources/Materials/Mat_GPUAnim 存在");
+                        return null;
+                    }
                 }
 
                 mat = new Material(baseMaterial);
@@ -53,6 +69,29 @@ namespace GPUAnimation
             return mat;
         }
 
+        private void OnDestroy()
+        {
+            // 销毁时清理材质缓存以释放内存
+            foreach (var material in _materialPool.Values)
+            {
+                if (material != null)
+                {
+#if UNITY_EDITOR
+                    if (Application.isEditor && !Application.isPlaying)
+                    {
+                        DestroyImmediate(material);
+                    }
+                    else
+                    {
+                        Destroy(material);
+                    }
+#else
+                    Destroy(material);
+#endif
+                }
+            }
+            _materialPool.Clear();
+        }
 
         private void Update()
         {

@@ -52,13 +52,18 @@ namespace GPUAnimation
 
         private void Awake()
         {
-            child = transform.GetChild(0);
+            child = transform.childCount > 0 ? transform.GetChild(0) : null;
             if (child == null)
             {
                 Debug.LogError($"没有发现渲染子物体");
                 return;
             }
             _renderer = child.GetComponent<MeshRenderer>();
+            if (_renderer == null)
+            {
+                Debug.LogError("子物体上没有找到MeshRenderer组件");
+                return;
+            }
             _propBlock = new MaterialPropertyBlock();
             
 #if UNITY_EDITOR
@@ -205,16 +210,23 @@ namespace GPUAnimation
             if (_timer >= _duration)
             {
                 IsPlaying = false;
+                _timer = _duration; // 确保计时器不超过持续时间
                 OnPlayFinished?.Invoke(this);
             }
         }
 
         public void ChangeAnimationCategory(Material newCategoryMat)
         {
+            if (_renderer == null)
+            {
+                Debug.LogError("MeshRenderer 组件未找到，无法更改动画类别");
+                return;
+            }
+            
             // 关键点：使用 sharedMaterial 实现同类合批
             _renderer.sharedMaterial = newCategoryMat;
         
-            if (newCategoryMat.mainTexture != null)
+            if (newCategoryMat != null && mainTexture != null)
             {
                 float pW = (float)mainTexture.width / Mathf.Max(1, columns);
                 float pH = (float)mainTexture.height / Mathf.Max(1, rows);
@@ -231,7 +243,11 @@ namespace GPUAnimation
 
         public void UpdateProperties(float startTime)
         {
-            if (_renderer == null) return;
+            if (_renderer == null) 
+            {
+                Debug.LogWarning("MeshRenderer 未找到，无法更新属性");
+                return;
+            }
             if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
 
             _renderer.GetPropertyBlock(_propBlock);
@@ -258,7 +274,11 @@ namespace GPUAnimation
             this.tintColor = color;
             
             // 立即应用修改
-            if (_renderer == null) return;
+            if (_renderer == null) 
+            {
+                Debug.LogWarning("MeshRenderer 未找到，无法设置着色颜色");
+                return;
+            }
             if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
 
             _renderer.GetPropertyBlock(_propBlock);
