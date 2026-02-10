@@ -10,6 +10,7 @@ Properties
         _TotalFrames ("Total Frames", Float) = 64
         _FPS ("FPS", Float) = 30
         [Toggle] _Loop ("Is Loop", Float) = 1
+        [Toggle] _IgnoreTimeScale ("Ignore Time Scale", Float) = 0
     }
     SubShader
     {
@@ -38,6 +39,7 @@ Properties
             };
 
             sampler2D _MainTex;
+            float4 _UnscaledTime;
 
             UNITY_INSTANCING_BUFFER_START(Props)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _Color) // 添加到 Buffer
@@ -50,6 +52,8 @@ Properties
                 UNITY_DEFINE_INSTANCED_PROP(float, _StartTime)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _PivotOffset)
                 UNITY_DEFINE_INSTANCED_PROP(float, _IsEditorPreview) // 编辑器预览模式：1=静态显示第一帧
+            
+                UNITY_DEFINE_INSTANCED_PROP(float, _IgnoreTimeScale)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             v2f vert (appdata v)
@@ -77,6 +81,7 @@ Properties
 
                 float isEditorPreview = UNITY_ACCESS_INSTANCED_PROP(Props, _IsEditorPreview);
                 
+                float ignoreTimeScale = UNITY_ACCESS_INSTANCED_PROP(Props, _IgnoreTimeScale);
                 float frameIndex;
                 // 编辑器预览模式：强制显示第一帧
                 if (isEditorPreview > 0.5)
@@ -85,8 +90,9 @@ Properties
                 }
                 else
                 {
+                    float currentTime = (ignoreTimeScale > 0.5) ? _UnscaledTime.y : _Time.y;
                     // 计算相对时间：当前全局时间 - 记录的开始时间
-                    float relativeTime = max(0, _Time.y - startTime);
+                    float relativeTime = max(0, currentTime - startTime);
                     frameIndex = floor(relativeTime * fps);
 
                     if (loop > 0.5) {

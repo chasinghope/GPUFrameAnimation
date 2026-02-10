@@ -20,6 +20,11 @@ namespace GPUAnimation
         public float fps = 30f;
         public bool isLoop = true;
 
+        [Header("Play Settings")] 
+        public bool AutoPlay = false;
+
+        public bool IgnoreTimeScale = false;
+
         // --- C# 标准事件接口 ---
         public event Action<GPUInstancedAnimation> OnPlayStart;    
         public event Action<GPUInstancedAnimation> OnPlayFinished; 
@@ -42,7 +47,7 @@ namespace GPUAnimation
         private static readonly int ID_PivotOffset = Shader.PropertyToID("_PivotOffset");
         private static readonly int ID_Color = Shader.PropertyToID("_Color");
         private static readonly int ID_IsEditorPreview = Shader.PropertyToID("_IsEditorPreview");
-        
+        private static readonly int ID_IgnoreTimeScale = Shader.PropertyToID("_IgnoreTimeScale");
         
 
         private void Awake()
@@ -162,7 +167,7 @@ namespace GPUAnimation
                 return;
             }
 #endif
-            if (Application.isPlaying) Play();
+            if (Application.isPlaying && AutoPlay) Play();
         }
 
         // 核心修改：初始化时向中控索要材质
@@ -175,8 +180,8 @@ namespace GPUAnimation
                 {
                     ChangeAnimationCategory(sharedMat);
                 }
+                
             }
-            UpdateProperties(Time.timeSinceLevelLoad);
         }
 
         [ContextMenu("Play")]
@@ -186,7 +191,8 @@ namespace GPUAnimation
             _duration = (fps > 0) ? (totalFrames / fps) : 0;
             _timer = 0f;
 
-            UpdateProperties(Application.isPlaying ? Time.timeSinceLevelLoad : 0f);
+            float startTime = IgnoreTimeScale ? Time.unscaledTime : Time.time;
+            UpdateProperties(startTime);
             OnPlayStart?.Invoke(this);
         }
 
@@ -194,7 +200,8 @@ namespace GPUAnimation
         {
             if (!IsPlaying || isLoop) return;
 
-            _timer += Time.deltaTime;
+            float deltaTime = IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+            _timer += deltaTime;
             if (_timer >= _duration)
             {
                 IsPlaying = false;
@@ -240,6 +247,7 @@ namespace GPUAnimation
             _propBlock.SetFloat(ID_TotalFrames, totalFrames);
             _propBlock.SetFloat(ID_FPS, fps);
             _propBlock.SetFloat(ID_Loop, isLoop ? 1f : 0f);
+            _propBlock.SetFloat(ID_IgnoreTimeScale, IgnoreTimeScale ? 1f : 0f);
             _propBlock.SetFloat(ID_StartTime, startTime); 
         
             _renderer.SetPropertyBlock(_propBlock);

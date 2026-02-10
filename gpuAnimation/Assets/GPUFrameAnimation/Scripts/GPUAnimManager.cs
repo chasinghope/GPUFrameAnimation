@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace GPUAnimation
     public class GPUAnimManager : MonoBehaviour
     {
         private static GPUAnimManager _instance;
+        private static readonly int UnscaledTime = Shader.PropertyToID("_UnscaledTime");
+
         public static GPUAnimManager Instance
         {
             get
@@ -48,6 +51,15 @@ namespace GPUAnimation
                 _materialPool.Add(tex, mat);
             }
             return mat;
+        }
+
+
+        private void Update()
+        {
+            // 模拟 Unity 的 _Time 结构： (t/20, t, t*2, t*3)
+            // 这样你在 Shader 里就能用 _UnscaledTime.y 了
+            float t = Time.unscaledTime;
+            Shader.SetGlobalVector(UnscaledTime, new Vector4(t / 20f, t, t * 2f, t * 3f));
         }
     }
 }
