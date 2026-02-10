@@ -32,14 +32,31 @@
 
 ### 3.2 基础参数设置
 
+<div style="text-align: left;">   <img src="doc/Image/a3.png" alt="a3" /> </div>
+
 在 `GPUInstancedAnimation` 组件面板中设置：
 
 - **Main Texture**：设置序列帧图集 。
+
+- **Pixels Per Unit**：PPU3
+
+- **Pivot**：调整中心点（0.5, 0.5 为中心，0.5, 0 为底部中心）。
+
+- **Tink Color**： 叠色
+
 - **Rows / Columns**：根据图集布局设置行数和列数 。
+
 - **Start Frame:** 起始索引
+
 - **Total Frames**：动画总帧数 。
+
 - **FPS**：动画播放速度 。
-- **Pivot**：调整中心点（0.5, 0.5 为中心，0.5, 0 为底部中心） 。
+
+- **Auto Play:**  OnEnable时自动播放
+
+- **Ignore Time Scale:** 是否忽略时间
+
+  
 
 ## 4. 进阶功能：受击闪烁 (Flash)
 
