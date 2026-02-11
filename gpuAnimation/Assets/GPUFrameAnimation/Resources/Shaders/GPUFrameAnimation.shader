@@ -93,12 +93,14 @@ Properties
                     float currentTime = (ignoreTimeScale > 0.5) ? _UnscaledTime.y : _Time.y;
                     // 计算相对时间：当前全局时间 - 记录的开始时间
                     float relativeTime = max(0, currentTime - startTime);
-                    frameIndex = floor(relativeTime * fps);
 
                     if (loop > 0.5) {
-                        frameIndex = fmod(frameIndex, totalFrames);
+                        // 循环模式：使用 frac 确保平滑循环，避免边界闪烁
+                        float progress = frac(relativeTime * fps / totalFrames);
+                        frameIndex = floor(progress * totalFrames);
                     } else {
-                        frameIndex = min(frameIndex, totalFrames - 1);
+                        // 非循环模式：限制在总帧数范围内
+                        frameIndex = min(floor(relativeTime * fps), totalFrames - 1);
                     }
                 }
                 

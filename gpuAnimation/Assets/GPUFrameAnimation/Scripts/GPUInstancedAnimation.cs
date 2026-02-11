@@ -265,7 +265,7 @@ namespace GPUAnimation
             _propBlock.SetFloat(ID_Loop, isLoop ? 1f : 0f);
             _propBlock.SetFloat(ID_IgnoreTimeScale, IgnoreTimeScale ? 1f : 0f);
             _propBlock.SetFloat(ID_StartTime, startTime); 
-        
+            _propBlock.SetFloat(ID_IsEditorPreview, 0f);
             _renderer.SetPropertyBlock(_propBlock);
         }
         
