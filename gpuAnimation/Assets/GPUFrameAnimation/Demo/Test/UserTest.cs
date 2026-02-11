@@ -1,33 +1,48 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UserTest : MonoBehaviour
+namespace GPUAnimation.Demo
 {
-    [SerializeField] private InputField inputField;
-    [SerializeField] private Button gpuBtn;
-    [SerializeField] private Button cpuBtn;
-    [SerializeField] private GPUInstanceTest gpuTest;
-    [SerializeField] private GPUInstanceTest cpuTest;
-
-
-    private void Awake()
+    public class UserTest : MonoBehaviour
     {
-        Application.runInBackground = true;
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
-    }
+        [SerializeField] private InputField inputField;
+        [SerializeField] private Button gpuBtn;
+        [SerializeField] private Button cpuBtn;
+        [SerializeField] private GPUInstanceTest gpuTest;
+        [SerializeField] private GPUInstanceTest cpuTest;
 
-    private void OnEnable()
-    {
-        gpuBtn.onClick.AddListener(() =>
+
+        private void Awake()
         {
-            int count = int.Parse(inputField.text);
-            gpuTest.Create(count);
-        });
-        
-        cpuBtn.onClick.AddListener(() =>
+            Application.runInBackground = true;
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        }
+
+        private void OnEnable()
         {
-            int count = int.Parse(inputField.text);
-            cpuTest.Create(count);
-        });
+            gpuBtn.onClick.AddListener(() =>
+            {
+                if (int.TryParse(inputField.text, out int count) && count > 0)
+                {
+                    gpuTest.Create(count);
+                }
+                else
+                {
+                    Debug.LogWarning("请输入有效的正整数");
+                }
+            });
+
+            cpuBtn.onClick.AddListener(() =>
+            {
+                if (int.TryParse(inputField.text, out int count) && count > 0)
+                {
+                    cpuTest.Create(count);
+                }
+                else
+                {
+                    Debug.LogWarning("请输入有效的正整数");
+                }
+            });
+        }
     }
 }

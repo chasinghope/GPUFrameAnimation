@@ -26,8 +26,6 @@ namespace GPUAnimation
 
         public event Action<string> EOnAnimStart, EOnAnimEnd;
 
-        private bool isBindEvent = false;
-        
         private void Awake()
         {
             gpuAnimationDict.Clear();
@@ -55,41 +53,30 @@ namespace GPUAnimation
 
         private void OnEnable()
         {
-            if (!isBindEvent)
+            foreach (var gpuAnimation in gpuAnimationParamList)
             {
-                isBindEvent = true;
-                foreach (var gpuAnimation in gpuAnimationParamList)
+                if(gpuAnimation.GpuAnim != null)
                 {
-                    if(gpuAnimation.GpuAnim != null)
-                    {
-                        gpuAnimation.GpuAnim.OnPlayStart += OnAnimStartCall;
-                        gpuAnimation.GpuAnim.OnPlayFinished += OnAnimEndCall;
-                    }
+                    gpuAnimation.GpuAnim.OnPlayStart += OnAnimStartCall;
+                    gpuAnimation.GpuAnim.OnPlayFinished += OnAnimEndCall;
                 }
             }
-            
-            
+
             if (autoPlay && gpuAnimationDict.ContainsKey(defaultAnimationName))
             {
                 Play(defaultAnimationName);
             }
         }
 
-
         private void OnDisable()
         {
-            if (isBindEvent)
+            foreach (var gpuAnimation in gpuAnimationParamList)
             {
-                foreach (var gpuAnimation in gpuAnimationParamList)
+                if(gpuAnimation.GpuAnim != null)
                 {
-                    if(gpuAnimation.GpuAnim != null)
-                    {
-                        gpuAnimation.GpuAnim.OnPlayStart -= OnAnimStartCall;
-                        gpuAnimation.GpuAnim.OnPlayFinished -= OnAnimEndCall;
-                    }
+                    gpuAnimation.GpuAnim.OnPlayStart -= OnAnimStartCall;
+                    gpuAnimation.GpuAnim.OnPlayFinished -= OnAnimEndCall;
                 }
-
-                isBindEvent = false;
             }
         }
 

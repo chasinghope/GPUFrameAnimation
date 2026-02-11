@@ -2,25 +2,28 @@ using GPUAnimation;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UserTestAnimator : MonoBehaviour
+namespace GPUAnimation.Demo
 {
-    [SerializeField] private InputField inputField;
-    [SerializeField] private Button changeButton;
-    [SerializeField] private GPUFrameAnimator animator;
-
-
-    private void Awake()
+    public class UserTestAnimator : MonoBehaviour
     {
-        Application.runInBackground = true;
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
-    }
+        [SerializeField] private InputField inputField;
+        [SerializeField] private Button changeButton;
+        [SerializeField] private GPUFrameAnimator animator;
 
-    private void OnEnable()
-    {
-        changeButton.onClick.AddListener(() =>
+
+        private void Awake()
         {
-            string animName = inputField.text;
-            animator.Play(animName);
-        });
+            Application.runInBackground = true;
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        }
+
+        private void OnEnable()
+        {
+            changeButton.onClick.AddListener(() =>
+            {
+                string animName = inputField.text;
+                animator.Play(animName);
+            });
+        }
     }
 }

@@ -2,40 +2,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GPUInstanceTest : MonoBehaviour
+namespace GPUAnimation.Demo
 {
-    [SerializeField]
-    private List<GameObject> prefabs;
-    [SerializeField]
-    private int count = 1000;
-        
-
-    private IEnumerator GenerateOverTime()
+    public class GPUInstanceTest : MonoBehaviour
     {
-        int index = 0;
-        for (int i = 0; i < count; i++)
+        [SerializeField]
+        private List<GameObject> prefabs;
+        [SerializeField]
+        private int count = 1000;
+
+
+        private IEnumerator GenerateOverTime()
         {
-            Vector3 pos = Vector3.zero;
-            pos.x = Random.Range(-1.6f, 1.6f);
-            pos.y = Random.Range(-4f, 4f);
-                
-            int prefabIndex = i % prefabs.Count;
-            GameObject prefab = prefabs[prefabIndex];
-            GameObject go = Instantiate(prefab, pos, Quaternion.identity);
-
-            index++;
-            if (index > 30)
+            int index = 0;
+            for (int i = 0; i < count; i++)
             {
-                yield return new WaitForSeconds(1f / 60f);
+                Vector3 pos = Vector3.zero;
+                pos.x = Random.Range(-1.6f, 1.6f);
+                pos.y = Random.Range(-4f, 4f);
+
+                int prefabIndex = i % prefabs.Count;
+                GameObject prefab = prefabs[prefabIndex];
+                GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+
+                index++;
+                if (index > 30)
+                {
+                    yield return new WaitForSeconds(1f / 60f);
+                }
+
             }
-
         }
-    }
 
 
-    public void Create(int num)
-    {
-        count = num;
-        StartCoroutine(GenerateOverTime());
+        public void Create(int num)
+        {
+            count = num;
+            StartCoroutine(GenerateOverTime());
+        }
     }
 }

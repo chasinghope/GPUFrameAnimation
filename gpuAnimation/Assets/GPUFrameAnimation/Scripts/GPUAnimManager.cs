@@ -7,7 +7,6 @@ namespace GPUAnimation
     public class GPUAnimManager : MonoBehaviour
     {
         private static GPUAnimManager _instance;
-        private static readonly object _lock = new object();
         private static readonly int UnscaledTime = Shader.PropertyToID("_UnscaledTime");
 
         public static GPUAnimManager Instance
@@ -16,15 +15,9 @@ namespace GPUAnimation
             {
                 if (_instance == null)
                 {
-                    lock (_lock)
-                    {
-                        if (_instance == null)
-                        {
-                            GameObject managerObj = new GameObject("GPUAnimManager");
-                            _instance = managerObj.AddComponent<GPUAnimManager>();
-                            DontDestroyOnLoad(managerObj);
-                        }
-                    }
+                    GameObject managerObj = new GameObject("GPUAnimManager");
+                    _instance = managerObj.AddComponent<GPUAnimManager>();
+                    DontDestroyOnLoad(managerObj);
                 }
                 return _instance;
             }
