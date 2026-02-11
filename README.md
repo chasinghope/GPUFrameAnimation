@@ -120,3 +120,7 @@ OnPlayStart;
 // 动画播放结束时触发（非循环模式下）
 OnPlayFinished;
 ```
+
+## 6. Spine导出设置
+
+<div style="text-align: left;">   <img src="doc/Image/spine1.png" alt="a3" /> </div>
