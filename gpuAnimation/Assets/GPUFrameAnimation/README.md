@@ -230,6 +230,107 @@ public void PlayFlash(float duration = -1f)
 
 ---
 
+### 5. AtlasParser (Editor 工具)
+
+**文件**: [Editor/Scripts/AtlasParser.cs](Editor/Scripts/AtlasParser.cs)
+
+**职责**: 编辑器工具，用于解析 .atlas/.atlas.txt 文件并提取动画状态信息
+
+#### 功能特性
+
+| 功能 | 说明 |
+|------|------|
+| 文件���滤 | 自动忽略以 `bounds` 和 `origin` 开头的行 |
+| 帧解析 | 根据最后一个下划线分割帧信息 |
+| 状态合并 | 自动合并同一状态的帧序列 |
+| 批量处理 | 支持多选文件批量解析 |
+
+#### 使用方式
+
+**方式一：菜单栏**
+```
+Tools > GPUFrameAnimation > Atlas Parser
+```
+
+**方式二：右键菜单（单个文件）**
+```
+选中 .atlas ���件 → 右键 → GPUFrameAnimation > Parse Atlas
+```
+
+**方式三：右键菜单（批量）**
+```
+选中多个 .atlas 文件 → 右键 → GPUFrameAnimation > Parse All Selected Atlas
+```
+
+#### 解析格式
+
+**输入文件格式**:
+```
+hero4-initial-atk_0
+hero4-initial-atk_1
+...
+hero4-initial-atk_29
+hero4-initial-idle_0
+hero4-initial-idle_1
+...
+bounds: ...
+origin: ...
+```
+
+**输出结果格式**:
+```
+hero4-initial-atk@0@30
+hero4-initial-idle@0@50
+```
+
+#### 数据结构
+
+```csharp
+public class AnimationStateInfo
+{
+    public string stateName;      // 状态名
+    public int startFrameIndex;   // 起始帧索引
+    public int frameCount;        // 总帧数
+}
+```
+
+---
+
+### 6. GPUFrameAnimatorDemo (Demo 脚本)
+
+**文件**: [Demo/GPUFrameAnimatorDemo.cs](Demo/GPUFrameAnimatorDemo.cs)
+
+**职责**: 功能演示脚本，展示 GPUFrameAnimator 的完整用法
+
+#### 功能特性
+
+| 功能 | 说明 |
+|------|------|
+| 动画选择 | 下拉菜单选择要播放的动画 |
+| 播放控制 | 播放按钮、上一个/下一个切换 |
+| 事件监听 | 显示动画开始/结束事件 |
+| 循环播放 | Toggle 开关控制循环播放 |
+| 状态显示 | 实时显示当前播放状态 |
+| 事件日志 | 带时间戳的事件记录，自动清理 |
+
+#### 公共方法
+
+```csharp
+// 播放指定动画
+public void PlayAnimation(string animName)
+
+// 通过索引播放动画
+public void PlayAnimationByIndex(int index)
+
+// 播放下一个动画
+public void PlayNextAnimation()
+
+// 播放上一个动画
+public void PlayPreviousAnimation()
+```
+
+---
+
 ## 程序集定义
 
 **文件**: [GPUFrameAnimation.asmdef](GPUFrameAnimation.asmdef)
@@ -311,6 +412,26 @@ animator.EOnAnimStart += (name) => Debug.Log($"Started: {name}");
 animator.EOnAnimEnd += (name) => Debug.Log($"Ended: {name}");
 ```
 
+### Atlas 文件解析 (Editor)
+
+```csharp
+// 使用 AtlasParser 工具解析 .atlas 文件
+using GPUAnimation.Editor;
+
+string filePath = "path/to/hero.atlas";
+List<AnimationStateInfo> states = AtlasParser.ParseAtlasFile(filePath);
+
+// 合并帧信息为完整动画状态
+List<AnimationStateInfo> mergedStates = AtlasParser.MergeFrameInfos(states);
+
+// 输出解析结果
+foreach (var state in mergedStates)
+{
+    Debug.Log($"{state.stateName}@{state.startFrameIndex}@{state.frameCount}");
+}
+// 输出: hero4-initial-atk@0@30
+```
+
 ---
 
 ## Shader 要求
@@ -347,13 +468,26 @@ _UnscaledTime     // 全局非缩放时间 (由 GPUAnimManager 设置)
 ## 目录结构
 
 ```
-Scripts/
-├── GPUAnimManager.cs           # 材质管理单例
-├── GPUInstancedAnimation.cs    # 核心动画组件
-├── GPUFrameAnimator.cs         # 动画控制器
-├── GPUAnimFlash.cs             # 闪烁效果
-├── GPUFrameAnimation.asmdef    # 程序集定义
-└── README.md                   # 本文档
+GPUFrameAnimation/
+├── Scripts/                          # 运行时脚本
+│   ├── GPUAnimManager.cs           # 材质管理单例
+│   ├── GPUInstancedAnimation.cs    # 核心动画组件
+│   ├── GPUFrameAnimator.cs         # 动画控制器
+│   ├── GPUAnimFlash.cs             # 闪烁效果
+│   └── GPUFrameAnimation.asmdef    # 程序集定义
+│
+├── Editor/                            # 编辑器脚本
+│   └── Scripts/
+│       └── AtlasParser.cs            # .atlas 文件解析工具
+│
+├── Demo/                              # 演示场景
+│   ├── Test/
+│   │   ├── UserTest.cs              # 批量生成测试
+│   │   ├── UserTestAnimator.cs       # 动画切换测试
+│   │   └── GPUInstanceTest.cs       # 实例化测试
+│   └── GPUFrameAnimatorDemo.cs       # 动画演示脚本
+│
+└── README.md                          # 本文档
 ```
 
 ---
@@ -378,10 +512,34 @@ using GPUAnimation;
 
 ## 版本信息
 
+### 运行时组件
+
 | 组件 | 文件 | 行数 |
 |------|------|------|
-| GPUAnimManager | [GPUAnimManager.cs](GPUAnimManager.cs) | 105 |
-| GPUInstancedAnimation | [GPUInstancedAnimation.cs](GPUInstancedAnimation.cs) | 317 |
-| GPUFrameAnimator | [GPUFrameAnimator.cs](GPUFrameAnimator.cs) | 167 |
-| GPUAnimFlash | [GPUAnimFlash.cs](GPUAnimFlash.cs) | 76 |
-| **总计** | | **665** |
+| GPUAnimManager | [Scripts/GPUAnimManager.cs](Scripts/GPUAnimManager.cs) | ~100 |
+| GPUInstancedAnimation | [Scripts/GPUInstancedAnimation.cs](Scripts/GPUInstancedAnimation.cs) | ~315 |
+| GPUFrameAnimator | [Scripts/GPUFrameAnimator.cs](Scripts/GPUFrameAnimator.cs) | ~155 |
+| GPUAnimFlash | [Scripts/GPUAnimFlash.cs](Scripts/GPUAnimFlash.cs) | ~75 |
+
+### 编辑器工具
+
+| 组件 | 文件 | 行数 |
+|------|------|------|
+| AtlasParser | [Editor/Scripts/AtlasParser.cs](Editor/Scripts/AtlasParser.cs) | ~400 |
+
+### Demo 脚本
+
+| 组件 | 文件 | 行数 |
+|------|------|------|
+| GPUFrameAnimatorDemo | [Demo/GPUFrameAnimatorDemo.cs](Demo/GPUFrameAnimatorDemo.cs) | ~180 |
+| UserTest | [Demo/Test/UserTest.cs](Demo/Test/UserTest.cs) | ~50 |
+| UserTestAnimator | [Demo/Test/UserTestAnimator.cs](Demo/Test/UserTestAnimator.cs) | ~30 |
+| GPUInstanceTest | [Demo/Test/GPUInstanceTest.cs](Demo/Test/GPUInstanceTest.cs) | ~35 |
+
+### 代码质量
+
+- ✅ 遵循 Unity C# 编程规范
+- ✅ 完整的中文注释
+- ✅ 空引用安全检查
+- ✅ 编辑器实时预览支持
+- ✅ Demo 命名空间组织
