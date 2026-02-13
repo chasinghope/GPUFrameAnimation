@@ -1,0 +1,4 @@
+[hook "prepush"]
+	cmdline = python \"c:\\Users\\Dio\\Desktop\\pythonSendMail\\send_mail.py\"
+	wait = true
+	show = true
