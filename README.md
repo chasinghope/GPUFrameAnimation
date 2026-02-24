@@ -1,3 +1,7 @@
+[DeepWiki]: https://deepwiki.com/chasinghope/GPUFrameAnimation
+
+
+
 # GPU 序列帧动画系统使用手册
 
 本系统基于 **GPU Instancing** 技术实现，支持在保持极低 Draw Call 的前提下，实现海量序列帧动画实体的独立播放与动态叠色。
